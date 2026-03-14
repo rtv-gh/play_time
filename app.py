@@ -3,22 +3,32 @@ import math
 from utils import allocate_halves, build_schedule
 
 st.set_page_config(
-    page_title="U10 Rugby Festival Planner",
+    page_title="Rugby Festival Planner",
     page_icon="🏉",
     layout="centered",
 )
 
-st.title("🏉 U10 Rugby Festival Planner")
+st.title("🏉 Rugby Festival Planner")
 st.caption("Equal playing time for every player")
 
 # ── Step 1: Tournament setup ──────────────────────────────────────────────────
 st.header("1. Tournament Setup")
 
-col1, col2 = st.columns(2)
+# Age group to players per side mapping
+age_group_map = {
+    "U9 (7-a-side)": 7,
+    "U10 (8-a-side)": 8,
+    "U11 (9-a-side)": 9,
+}
+
+col1, col2, col3 = st.columns(3)
 with col1:
-    num_games = st.selectbox("Number of games", [4, 5], index=1)
+    age_group = st.selectbox("Age group", list(age_group_map.keys()), index=1)
+    players_per_side = age_group_map[age_group]
 with col2:
-    st.metric("Players per side (RFU U10)", 8, delta=None)
+    num_games = st.selectbox("Number of games", [3, 4, 5, 6], index=1)
+with col3:
+    st.metric("Players per side (RFU)", players_per_side, delta=None)
 
 # ── Step 2: Squad ─────────────────────────────────────────────────────────────
 st.header("2. Squad")
@@ -42,11 +52,11 @@ with st.expander("✏️ Edit player names (tap to open)", expanded=False):
 players = [p.strip() for p in raw.splitlines() if p.strip()]
 num_players = len(players)
 
-if num_players < 8:
-    st.error("⚠️ You need at least 8 players.")
+if num_players < players_per_side:
+    st.error(f"⚠️ You need at least {players_per_side} players for {age_group}.")
     st.stop()
 
-total_slots = num_games * 2 * 8  # games × halves × players per side
+total_slots = num_games * 2 * players_per_side  # games × halves × players per side
 halves_each = allocate_halves(num_players, total_slots)
 
 st.info(
@@ -79,7 +89,7 @@ for i in range(num_games):
 st.header("4. Squad Selection")
 
 if st.button("🎲 Generate schedule", type="primary", use_container_width=True):
-    schedule = build_schedule(players, halves_each, num_games)
+    schedule = build_schedule(players, halves_each, num_games, players_per_half=players_per_side)
     st.session_state["schedule"] = schedule
     st.session_state["opposition"] = opposition
 
