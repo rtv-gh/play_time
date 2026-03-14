@@ -16,6 +16,8 @@ st.header("1. Tournament Setup")
 
 # Age group to players per side mapping
 age_group_map = {
+    "U7 (4-a-side)": 4,
+    "U8 (6-a-side)": 6,
     "U9 (7-a-side)": 7,
     "U10 (8-a-side)": 8,
     "U11 (9-a-side)": 9,
