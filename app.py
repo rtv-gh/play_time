@@ -1,5 +1,7 @@
 import streamlit as st
 import math
+import csv
+import io
 from utils import allocate_halves, build_schedule
 
 st.set_page_config(
@@ -123,3 +125,94 @@ if "schedule" in st.session_state:
     rows = sorted(tally.items(), key=lambda x: x[0])
     for name, count in rows:
         st.markdown(f"**{name}** — {count} half(ves)")
+
+    # ── Step 5: Record Actual Playing Time ────────────────────────────────────
+    st.header("5. Record Actual Playing Time")
+    st.caption("💡 Adjust for injuries, substitutions, or other changes")
+
+    # Initialize actual players tracking in session state
+    if "actual_players" not in st.session_state:
+        st.session_state["actual_players"] = {}
+
+    actual_players_state = st.session_state["actual_players"]
+
+    # Record actual players for each game and half
+    for g_idx, game in enumerate(schedule):
+        opp_name = saved_opp[g_idx] if g_idx < len(saved_opp) else opposition[g_idx]
+        st.subheader(f"Game {g_idx + 1} — vs {opp_name}")
+
+        for half_label in ("1st", "2nd"):
+            scheduled = game[half_label]
+            key_prefix = f"actual_{g_idx}_{half_label}"
+
+            # Initialize this half's actual players if not exists
+            if key_prefix not in actual_players_state:
+                actual_players_state[key_prefix] = set(scheduled)
+
+            st.markdown(f"**{half_label} Half** — Check who actually played:")
+
+            # Display checkboxes in columns for compact layout
+            cols = st.columns(3)
+            for col_idx, player in enumerate(players):
+                col = cols[col_idx % 3]
+                with col:
+                    is_checked = st.checkbox(
+                        player,
+                        value=player in actual_players_state[key_prefix],
+                        key=f"check_{key_prefix}_{player}",
+                    )
+                    if is_checked:
+                        actual_players_state[key_prefix].add(player)
+                    else:
+                        actual_players_state[key_prefix].discard(player)
+
+            # Show count comparison
+            scheduled_count = len(scheduled)
+            actual_count = len(actual_players_state[key_prefix])
+            if actual_count == scheduled_count:
+                st.caption(f"✓ {actual_count} players ({scheduled_count} planned)")
+            else:
+                st.caption(f"⚠️ {actual_count} players ({scheduled_count} planned)")
+
+    # ── Step 6: Actual Playing Time Summary ───────────────────────────────────
+    st.header("6. Actual Playing Time Summary")
+
+    actual_tally = {p: 0 for p in players}
+    for key, selected_players in actual_players_state.items():
+        for player in selected_players:
+            actual_tally[player] += 1
+
+    # Display actual vs scheduled comparison
+    st.markdown("**Comparison: Scheduled vs Actual**")
+    comparison_cols = st.columns(3)
+    rows = sorted(actual_tally.items(), key=lambda x: x[0])
+    for idx, (name, actual_count) in enumerate(rows):
+        scheduled_count = tally[name]
+        col = comparison_cols[idx % 3]
+        with col:
+            if actual_count == scheduled_count:
+                st.metric(name, f"{actual_count}h", "✓")
+            elif actual_count > scheduled_count:
+                st.metric(name, f"{actual_count}h", f"+{actual_count - scheduled_count}h", delta_color="off")
+            else:
+                st.metric(name, f"{actual_count}h", f"{actual_count - scheduled_count}h", delta_color="off")
+
+    # ── Step 7: Export Results ────────────────────────────────────────────────
+    st.header("7. Export Results")
+
+    csv_buffer = io.StringIO()
+    writer = csv.writer(csv_buffer)
+    writer.writerow(["Player", "Scheduled Halves", "Actual Halves", "Difference"])
+    for name in sorted(players):
+        scheduled = tally[name]
+        actual = actual_tally[name]
+        difference = actual - scheduled
+        writer.writerow([name, scheduled, actual, difference])
+
+    csv_content = csv_buffer.getvalue()
+    st.download_button(
+        label="📥 Download actual playing time (CSV)",
+        data=csv_content,
+        file_name="actual_playing_time.csv",
+        mime="text/csv",
+    )
