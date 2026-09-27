@@ -1,4 +1,4 @@
-# U10 Rugby Festival Planner
+# Rugby Festival Planner
 
 A Streamlit app that allocates equal playing time across all squad players in a junior rugby union festival (U10, 8-a-side, RFU Age Grade).
 

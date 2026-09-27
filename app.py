@@ -2,6 +2,7 @@ import streamlit as st
 import math
 import csv
 import io
+from collections import Counter
 from utils import allocate_halves, build_schedule
 
 st.set_page_config(
@@ -38,10 +39,9 @@ with col3:
 st.header("2. Squad")
 
 DEFAULT_PLAYERS = [
-    "Seb", "Albie", "Henry", "Ben", "Pierce", "George",
+    "Seb", "Albie", "Henry", "Caleb", "Ben", "George", "Duart",
     "Will", "Arthur", "RJ", "Antonio", "Daniel", "Mitchell",
-    "Archie", "Jackson"
-]
+    "Archie B", "Jackson", "Archie A"]
 
 # Initialize with default players
 raw = "\n".join(DEFAULT_PLAYERS)
@@ -54,6 +54,14 @@ with st.expander("✏️ Edit player names (tap to open)", expanded=False):
     )
 
 players = [p.strip() for p in raw.splitlines() if p.strip()]
+duplicate_names = sorted(name for name, count in Counter(players).items() if count > 1)
+if duplicate_names:
+    st.error(
+        "Player names must be unique. Please distinguish duplicate names, for "
+        f"example with initials: {', '.join(duplicate_names)}."
+    )
+    st.stop()
+
 num_players = len(players)
 
 if num_players < players_per_side:
