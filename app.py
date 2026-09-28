@@ -11,11 +11,78 @@ st.set_page_config(
     layout="centered",
 )
 
+st.markdown(
+    """
+    <style>
+    @media (max-width: 640px) {
+        .block-container {
+            padding: 1rem 1rem 2rem;
+        }
+        div[data-testid="stHorizontalBlock"] {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+            flex: 1 1 calc(50% - 0.75rem) !important;
+            min-width: min(100%, 10rem);
+        }
+        div[data-testid="stRadio"] div[role="radiogroup"] {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.title("🏉 Rugby Festival Planner")
-st.caption("Equal playing time for every player")
+st.markdown("### Equal playing time for every player")
+st.markdown(
+    '<a href="https://rfu.widen.net/s/fcvtlrnlqb/rfu-regulation-15-2026-27" '
+    'target="_blank" rel="noopener noreferrer">'
+    "Official RFU Age Grade Regulation 15 (2026-27)</a>",
+    unsafe_allow_html=True,
+)
+
+age_group_regulation_links = {
+    "U7 (4-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-1-u7-rules-of-play",
+    "U8 (6-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-2-u8-rules-of-play",
+    "U9 (7-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-3-u9-rules-of-play",
+    "U10 (8-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-4-u10-rules-of-play",
+    "U11 (9-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-5-u11-rules-of-play",
+}
+
+page = st.radio(
+    "App pages",
+    ["Home", "Age regulations", "Videos"],
+    horizontal=True,
+    label_visibility="collapsed",
+    key="app_page",
+)
+
+if page == "Age regulations":
+    st.header("Age regulations")
+    st.caption("Age Grade rules of play and summaries by age group.")
+    for age_group, regulation_url in age_group_regulation_links.items():
+        age_label = age_group.split()[0]
+        with st.expander(f"{age_label} rules of play"):
+            st.caption("Regulation summary to be added.")
+            st.markdown(
+                f'<a href="{regulation_url}" target="_blank" '
+                'rel="noopener noreferrer">View official RFU rules of play</a>',
+                unsafe_allow_html=True,
+            )
+    st.stop()
+
+if page == "Videos":
+    st.header("Coaching videos")
+    st.caption("Rugby coaching videos for festival preparation.")
+    st.info("Video links to be added.")
+    st.stop()
 
 # ── Step 1: Tournament setup ──────────────────────────────────────────────────
-st.header("1. Tournament Setup")
+st.header("1. Team set up")
 
 # Age group to players per side mapping
 age_group_map = {
@@ -30,6 +97,12 @@ col1, col2, col3 = st.columns(3)
 with col1:
     age_group = st.selectbox("Age group", list(age_group_map.keys()), index=1)
     players_per_side = age_group_map[age_group]
+    st.markdown(
+        f'<a href="{age_group_regulation_links[age_group]}" '
+        'target="_blank" rel="noopener noreferrer">'
+        f"RFU {age_group.split()[0]} Rules of Play</a>",
+        unsafe_allow_html=True,
+    )
 with col2:
     num_games = st.selectbox("Number of games", [3, 4, 5, 6], index=1)
 with col3:
