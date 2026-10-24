@@ -50,6 +50,7 @@ Install dependencies and start the app:
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+streamlit run play_time/app.py
 ```
 
 Streamlit prints the local URL, usually http://localhost:8501.
@@ -69,13 +70,13 @@ Add each video as an object in `videos.json` with these fields:
 {
 	"topic": "Passing",
 	"title": "Passing fundamentals",
-	"embed_url": "https://www.facebook.com/plugins/video.php?...",
-	"width": 267,
+	"embed_url": "https://www.facebook.com/plugins/video.php?href=...&show_text=false&width=300",
+	"width": 300,
 	"height": 476
 }
 ```
 
-Use the platform's embeddable player URL for `embed_url`, not the entire `<iframe>` HTML snippet. Copy the source and dimensions from its embed dialog. Videos with matching `topic` values are displayed under the same heading; add more objects to the JSON array to grow a topic or introduce a new one. Keep the JSON valid (double quotes, commas between fields and items).
+For Facebook, copy the `src` URL from the `<iframe>` in Facebook's generated embed code into `embed_url`. Do not paste the whole HTML snippet. The app displays each player as a direct iframe, avoiding a second SDK-generated iframe inside Streamlit's HTML component. `width` and `height` set the displayed player dimensions; Facebook's desktop embed width must be at least 220 pixels. Videos with matching `topic` values are displayed under the same heading; add more objects to the JSON array to grow a topic or introduce a new one. Keep the JSON valid (double quotes, commas between fields and items).
 
 For Facebook videos, the original video must be public and embeddable. Facebook login, privacy settings, regional restrictions, or browser tracking protections may prevent playback even when the URL is correct. Test embeds on the deployed site and on a phone.
 

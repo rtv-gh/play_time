@@ -3,6 +3,7 @@ import math
 import csv
 import io
 import json
+from html import escape
 from collections import Counter
 from pathlib import Path
 import streamlit.components.v1 as components
@@ -92,11 +93,13 @@ if page == "Videos":
             st.subheader(topic)
             for video in video_library:
                 if video["topic"] == topic:
-                    st.markdown(f"**{video['title']}**")
+                    st.markdown(f"**{escape(video['title'])}**")
+                    width = int(video.get("width", 300))
+                    height = int(video.get("height", 476))
                     components.iframe(
                         video["embed_url"],
-                        width=video["width"],
-                        height=video["height"],
+                        width=width,
+                        height=height,
                         scrolling=False,
                     )
     st.stop()
