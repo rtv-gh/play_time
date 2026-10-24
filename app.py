@@ -2,7 +2,10 @@ import streamlit as st
 import math
 import csv
 import io
+import json
 from collections import Counter
+from pathlib import Path
+import streamlit.components.v1 as components
 from utils import allocate_halves, build_schedule
 
 st.set_page_config(
@@ -52,6 +55,9 @@ age_group_regulation_links = {
     "U10 (8-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-4-u10-rules-of-play",
     "U11 (9-a-side)": "https://www.englandrugby.com/run/rules-governance/rfu-rules-and-regulations/regulation-15-age-grade-rugby/regulation-15-appendix-5-u11-rules-of-play",
 }
+video_library = json.loads(
+    Path(__file__).with_name("videos.json").read_text(encoding="utf-8")
+)
 
 page = st.radio(
     "App pages",
@@ -78,7 +84,21 @@ if page == "Age regulations":
 if page == "Videos":
     st.header("Coaching videos")
     st.caption("Rugby coaching videos for festival preparation.")
-    st.info("Video links to be added.")
+    if not video_library:
+        st.info("Video links to be added.")
+    else:
+        topics = dict.fromkeys(video["topic"] for video in video_library)
+        for topic in topics:
+            st.subheader(topic)
+            for video in video_library:
+                if video["topic"] == topic:
+                    st.markdown(f"**{video['title']}**")
+                    components.iframe(
+                        video["embed_url"],
+                        width=video["width"],
+                        height=video["height"],
+                        scrolling=False,
+                    )
     st.stop()
 
 # ── Step 1: Tournament setup ──────────────────────────────────────────────────
