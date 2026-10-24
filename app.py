@@ -58,7 +58,7 @@ age_group_regulation_links = {
 video_library = json.loads(
     Path(__file__).with_name("videos.json").read_text(encoding="utf-8")
 )
-video_directory = Path(__file__).resolve().parent.parent / "videos"
+video_directory = Path(__file__).resolve().parent / "videos"
 
 page = st.radio(
     "App pages",

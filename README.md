@@ -18,13 +18,12 @@ Player names must be unique. The app starts with example player names, which can
 ## Project files
 
 ```text
-project-root/
-├── play_time/
-│   ├── app.py            # Streamlit interface and page navigation
-│   ├── utils.py          # Squad allocation and schedule generation
-│   ├── videos.json       # Video titles, topics, and filenames
-│   ├── requirements.txt  # Python dependencies
-│   └── README.md
+project-root/                 # Git repository root
+├── app.py                    # Streamlit interface and page navigation
+├── utils.py                  # Squad allocation and schedule generation
+├── videos.json               # Video titles, topics, and filenames
+├── requirements.txt          # Python dependencies
+├── README.md
 └── videos/
 	└── video_tackling_technique_1.mp4
 ```
@@ -34,7 +33,6 @@ project-root/
 Python 3 and pip are required.
 
 ```bash
-cd play_time
 python -m venv .venv
 ```
 
@@ -61,12 +59,12 @@ Streamlit prints the local URL, usually http://localhost:8501.
 
 1. Push the project to a GitHub repository.
 2. In Streamlit Community Cloud, create an app from that repository and select the branch.
-3. Keep both `play_time/` and `videos/` in the repository root, and set the main file path to `play_time/app.py`. The app reads media from the sibling `videos/` directory.
+3. Keep `videos/` in the repository beside `app.py`, and set the main file path to `app.py`.
 4. Deploy. Streamlit installs dependencies from `requirements.txt`.
 
 ## Update video content
 
-Put each MP4 file in the project-root `videos/` directory, then add an object to `play_time/videos.json`:
+Put each MP4 file in the repository's `videos/` directory, then add an object to `videos.json`:
 
 ```json
 {
@@ -80,7 +78,7 @@ The app plays each local file with Streamlit's video player. Videos with matchin
 
 ## Video file considerations
 
-- Keep the `videos/` folder in the deployed repository next to `play_time/`; otherwise the app will show a missing-file warning.
+- Keep the `videos/` folder in the deployed repository next to `app.py`; otherwise the app will show a missing-file warning.
 - GitHub blocks individual files larger than 100 MiB and warns for files over 50 MiB. Compress videos before committing, for example as H.264/AAC MP4 at a practical resolution and bitrate.
 - Large media makes repository clones and deployments slower, consumes repository storage, and uses app bandwidth each time coaches play videos. Deleting a large file in a later commit does not remove it from Git history.
 - Streamlit Community Cloud documents approximate resource limits of 50 GB storage and up to 2.7 GB memory per app; these limits can change. The storage figure is an app resource limit, not a per-video upload allowance. Keep enough headroom for the app and playback, and check current Cloud limits before deploying a large library.
@@ -91,6 +89,6 @@ The app plays each local file with Streamlit's video player. Videos with matchin
 
 - Add age-group summaries to the corresponding U7-U11 sections in the Age regulations page in `app.py`.
 - Update the RFU links in `app.py` if the official destinations change.
-- Keep video metadata in `videos.json`, media in the project-root `videos/` folder, and layout/rendering changes in `app.py`.
+- Keep video metadata in `videos.json`, media in `videos/`, and layout/rendering changes in `app.py`.
 
 The dependency list is maintained in `requirements.txt` (`streamlit>=1.35.0`).
