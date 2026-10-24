@@ -6,7 +6,6 @@ import json
 from html import escape
 from collections import Counter
 from pathlib import Path
-import streamlit.components.v1 as components
 from utils import allocate_halves, build_schedule
 
 st.set_page_config(
@@ -59,6 +58,7 @@ age_group_regulation_links = {
 video_library = json.loads(
     Path(__file__).with_name("videos.json").read_text(encoding="utf-8")
 )
+video_directory = Path(__file__).resolve().parent.parent / "videos"
 
 page = st.radio(
     "App pages",
@@ -94,14 +94,14 @@ if page == "Videos":
             for video in video_library:
                 if video["topic"] == topic:
                     st.markdown(f"**{escape(video['title'])}**")
-                    width = int(video.get("width", 300))
-                    height = int(video.get("height", 476))
-                    components.iframe(
-                        video["embed_url"],
-                        width=width,
-                        height=height,
-                        scrolling=False,
-                    )
+                    video_path = video_directory / video["file"]
+                    if video_path.is_file():
+                        st.video(str(video_path))
+                    else:
+                        st.warning(
+                            f"Video file not found: {video_path.name}. "
+                            "Check that it is in the videos folder."
+                        )
     st.stop()
 
 # ── Step 1: Tournament setup ──────────────────────────────────────────────────
